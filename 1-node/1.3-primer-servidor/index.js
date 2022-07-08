@@ -7,7 +7,7 @@ const server = http.createServer((request, response) => {
     response.write('<html> <body> Hola </body> </html>');
 });
 
-server.listen(8080);
+server.listen(8000);
 console.log('Inicie el servidor...')
 
 
