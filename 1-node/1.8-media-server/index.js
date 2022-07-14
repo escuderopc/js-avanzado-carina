@@ -6,6 +6,7 @@ const url = require('url');
 const fs = require('fs');
 const colors = require('colors');
 
+const CONTENT_TYPE = 'Content-Type';
 const MIME_TYPES = {
     html: 'text/html',
     css: 'text/css',
@@ -23,21 +24,22 @@ const server = http.createServer((request, response) => {
     // Paso 1: Obtener la path de la request
     const urlObject = url.parse(request.url);
     const path = urlObject.path;
-    //console.log(`Path solicitada: `, path);
 
     // Paso 2: Definimos las variables que le vamos a setear a la response
     let status = 0;
     let responseObj = {};
     let fileSystemPath = '';
 
+    // Paso 3: Validamos la existencia de path para concatenarle "static"
     if (path) {
-        fileSystemPath = `static${path}`;
+        fileSystemPath = `static${path}`
     }
     console.log(`Path solicitada: `, fileSystemPath);
 
-
+    // Paso 4: Validar si existe la path en el sistema
     fs.stat(fileSystemPath, error => {
         if (!error) {
+            // Paso 5: Leer el archivo multimedia solicitado
             fs.readFile(fileSystemPath, (error, file) => {
                 if (!error) {
                     // fileSytemPath = index.html
@@ -45,25 +47,31 @@ const server = http.createServer((request, response) => {
                     const aux = fileSystemPath.split('.'); // index.html => ['index', 'html']
                     const extension = aux[ aux.length - 1 ];
                     const mimeType = MIME_TYPES[extension]; // MIME_TYPES.html;
-                    response.writeHead(status, { 'Content-Type': mimeType } );
+                    // Paso 5.1: Devolver el archivo solicitado
+                    response.writeHead(status, { [CONTENT_TYPE] : mimeType } );
                     response.write(file);
                     response.end();        
                 } else {
+                    // Paso 5.1: Devolver un error si no se puede leer el archivo
                     status = 500;
                     responseObject = { message: 'Internal server error' };
-                    response.writeHead(status, { 'Content-Type': MIME_TYPES.json } );
+                    response.writeHead(status, { [CONTENT_TYPE] : MIME_TYPES.json } );
                     response.write(responseObject);
                     response.end();        
                 }
             });
         } else {
+            // Paso 5.1: Devolver un error de lectura del archivo
+            console.log('error:', error)
             status = 404;
             responseObject = { message: 'Not found' };
-            response.writeHead(status, { 'Content-Type': MIME_TYPES.json } );
+            response.writeHead(status, { [CONTENT_TYPE] : MIME_TYPES.json } );
             response.write(responseObject);
             response.end();
         }
     });
+
+    
 
 });
 
