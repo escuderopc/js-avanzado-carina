@@ -1,7 +1,5 @@
-//Peticiones
-//localhost:8000/index.html
-//localhost:8000/pagina1.html
-//localhost:8000/foto1,jpg
+// PETICIONES
+// localhost:8080/index.html
 
 const http = require('http');
 const url = require('url');
@@ -17,30 +15,34 @@ const MIME_TYPES = {
     mp4: 'video/mp4',
     json: 'application/json'
 };
+// MIME_TYPES.html
+// MIME_TYPES['html']
 
 const server = http.createServer((request, response) => {
-
-    //Paso 1: Obtener la path de la request
+    
+    // Paso 1: Obtener la path de la request
     const urlObject = url.parse(request.url);
     const path = urlObject.path;
-    console.log('Path solicitada: ', path)
-    
-    // Paso 2: Definimos las variables que le vamos a setear a la rsponse
+    //console.log(`Path solicitada: `, path);
+
+    // Paso 2: Definimos las variables que le vamos a setear a la response
     let status = 0;
-    let ResponseObj = {};
+    let responseObj = {};
     let fileSystemPath = '';
 
-    if(path){
-        fileSystemPath = 'static$(path)';
+    if (path) {
+        fileSystemPath = `static${path}`;
     }
+    console.log(`Path solicitada: `, fileSystemPath);
 
-    fs.stat(fileSytemPath, error => {
+
+    fs.stat(fileSystemPath, error => {
         if (!error) {
-            fs.readFile(fileSytemPath, (error, file) => {
+            fs.readFile(fileSystemPath, (error, file) => {
                 if (!error) {
                     // fileSytemPath = index.html
                     status = 200;
-                    const aux = fileSytemPath.split('.'); // index.html => ['index', 'html']
+                    const aux = fileSystemPath.split('.'); // index.html => ['index', 'html']
                     const extension = aux[ aux.length - 1 ];
                     const mimeType = MIME_TYPES[extension]; // MIME_TYPES.html;
                     response.writeHead(status, { 'Content-Type': mimeType } );
@@ -61,10 +63,10 @@ const server = http.createServer((request, response) => {
             response.write(responseObject);
             response.end();
         }
-
     });
+
 });
 
 server.listen(8000);
 console.log('API en node...'.rainbow);
-console.log('Esperando peticiones...'.yellow);
+console.log('Esperando peticiones....'.yellow);
